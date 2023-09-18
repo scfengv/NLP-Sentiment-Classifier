@@ -69,13 +69,13 @@ tknzr = TweetTokenizer()
 
 $$
 tun=
-\left\{
+\begin{cases}
     \begin{matrix}
         tune\\
         tuned\\
         tuning
     \end{matrix}
-\right.
+\end{cases}
 $$
 
 
@@ -110,12 +110,12 @@ $$
 
 $$
 decision=
-\left\{
+\begin{cases}
     \begin{matrix}
         1,\ if\ \sigma(z)>0.5\\
         0,\ if\ \sigma(z)<0.5
     \end{matrix}
-\right.\tag{5}
+\end{cases}\tag{5}
 $$
 
 ```python
@@ -150,19 +150,19 @@ $$
 
 若再將 Loss Function 做細部的拆解的話可以發現其實是由兩個部分所貢獻，分別是當 $y = 1$ 時主導的 $y \log \hat{y}$ 和 當 $y = 0$ 時主導的 $(1-y) \log(1- \hat{y})$，而兩部分的分析如下。
 
-| y | $y \log \hat{y}$ | $(1-y) \log(1- \hat{y})$
+| y | $y \log \hat{y}$ | $(1-y) \log(1- \hat{y})$ |
 | --- | --- | --- |
 | 0 | 0 | any |
 | 1 | any | 0 |
 
 
-| y | $\hat{y}$ | $y \log \hat{y}$
+| y | $\hat{y}$ | $y \log \hat{y}$ |
 | --- | --- | --- |
 | 0 | any | 0 |
 | 1 | 0.99 | ~0 |
 | 1 | ~0 | $-\infty$ |
 
-| y | $\hat{y}$ | $(1-y) \log(1- \hat{y})$
+| y | $\hat{y}$ | $(1-y) \log(1- \hat{y})$ |
 | --- | --- | --- |
 | 1 | any | 0 |
 | 0 | 0.01 | ~0 |
