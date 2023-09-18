@@ -11,6 +11,5 @@
 
 # Logistic Regression
 在 **Logistic Regression** 模型中，首先將每句 Tweets 經過資料前處理 (移除 Stop words, Punctuation, @, #, URLs 和 Stemming) 過後，組成一個擁有所有詞彙 (令有 m 個不同詞彙) 的 Vocabulary。在計算特定詞彙在 Positive Tweets 和 Negative Tweets 中分別出現的次數後，每個詞彙會形成一個 (1x3) 的矩陣，分別是 bias、在 Postive 中的詞頻、在 Negative 中的詞頻 [1 (bias), pos, neg]，所有詞彙彙整成一個矩陣會組成一個 (mx3) 的 input matrix (training X)，再放入 Sigmoid Function 中，
-![Alt text](Untitled.png)
 
 
