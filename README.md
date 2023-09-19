@@ -305,7 +305,7 @@ After\ some\ complicate\ algebra...
 $$
 
 $$
-\frac{\partial}{\partial w_i}L = [\sigma (w \cdot x +b)-y]x_i \\
+\frac{\partial}{\partial w_i}L = [\sigma (w \cdot x +b)-y]x_i \\ 
 = {\color{red}[\hat{y} - y] x_i}\ \ \ \ \ \ \ 
 $$
 
