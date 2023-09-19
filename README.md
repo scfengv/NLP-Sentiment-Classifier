@@ -78,6 +78,63 @@ tun=
 \end{cases}
 $$
 
+```python
+def build_freqs(tweets, ys):
+
+    yslist = np.squeeze(ys).tolist()
+    
+    freqs = {}
+
+    for y, tweet in zip(yslist, tweets):
+        for word in process_tweet(tweet):
+
+            pair = (word, y)
+
+            if pair in freqs:
+                freqs[pair] += 1
+
+            else:
+                freqs[pair] = 1
+
+    return freqs
+```
+
+***input***
+
+`tweets`: a list of unprocessed tweets
+
+`ys`: sentiment label (1, 0) of each tweet (m, 1)
+
+***return***
+
+`freqs`: a dictionary contains all of the words and it's sentiment frequency
+
+`freqs.keys()`: (word, sentiment) (Ex: `('pleas', 1.0)`)
+
+`freqs.values()`: frequency (Ex: `81`)
+
+Which means that there are 81 positive tweets contain 'pleas'
+
+```python
+keys = ['''words that are interested''']
+
+data = []
+
+for word in keys:
+
+    pos = 0
+    neg = 0
+    
+    if (word, 1) in freqs:
+        pos = freqs[(word, 1)]
+        
+    if (word, 0) in freqs:
+        neg = freqs[(word, 0)]
+        
+    data.append([word, pos, neg])
+    
+data
+```
 
 # Generative and Discriminative Classifiers
 Logistic Regression 和 Naive Bayes 兩者最大的不同在於 Losgistic Regression 屬於 Discriminative Classifiers 而 Naive Bayes 屬於 Generative Classifiers <sub>[1]</sub>。以貓狗分類器作為例子，Generative Classifier 會想去了解貓和狗分別長什麼樣子，而 Discriminative Classifier 只想知道該怎麼去分辨這兩個種類。也可以透過 eq. 1 & 2 來了解兩者的差異，在 Generative Classifier 中，模型會基於 $\color{red}Prior$ 對於資料機率分布的假設 (Ex: Gaussian, Laplacian) 去計算類別的 $\color{blue}Likelihood$，但在 Discriminative Classifier 中，模型則是直接計算事後機率 $P(c|d)$，對資料不進行任何假設。在計算上 Discriminative Classifier 是透過 Gradient Descent 直接將 $w\ (weight),\ b\ (bias)$ 找出，而 Generative Classifier 會利用 Singular Value Decomposition (SVD) 先找出 $U\ (unitary\ matrix)$, $\Sigma\ (rectangular\ matrix)$, $V^*\ (conjugate\ transpose)$，再計算出 $w\ (weight),\ b\ (bias)$。
@@ -120,10 +177,10 @@ $$
 
 ```python
 def sigmoid(z): 
-    h = 1/(1+np.exp(-z))    
+    h = 1/(1 + np.exp(-z))    
     return h
 ```
-**The Cross-Entropy Loss Function**
+<h3>The Cross-Entropy Loss Function</h3>
 
 在 Logistic Regression 中用來量化模型表現的方式為去計算 Classifier output ($\hat{y}=\sigma(w \cdot x +b)$) 和 Real output (y = 0 or 1, Bernoulli distribution) 之間的距離 (在 Gradient Descent 的部分有更詳細的說明)，稱為 Cost Function 或 Cross-Entropy Loss Function，在一個理想的情況下，一個完美的 Classifier 會 assign $P(y|x) = 1$ 給 $y = 1$，反之 $P(y|x) = 0$ 給 $y = 0$，藉由計算 $\hat{y}$ 和 y 之間的差距。
 由於結果的二元離散分佈特性，故可以將模型做出正確決定的機率 $P(y|x)$ 表達為 eq. 6，將其取 Log 可得到更直觀的 eq. 7，以機率的觀念會希望求得 $\hat{y}$ 使 $\log(P(y|x))$ 最大，但在 Loss Function 的觀念中會希望越小越好，故將 $\log(P(y|x))$ 加一個負號 (eq. 8)，帶入 Sigmoid Function 即可得到 **Logistic Regression 中的 Loss Function** (eq. 9)。
@@ -170,7 +227,7 @@ $$
 | 0 | ~1 | $-\infty$ |
 
 
-**Gradient Descent**
+<h3>Gradient Descent</h3>
 
 Gradient Descent 的目的是在找出一個理想的 $w_i$ 可以使 Loss Function 最小 (eq. 10)，以微積分的角度，梯度的方向是 Loss Function 在權重 $w_i$ 時的最大增加方向，量則是此方向上的增加量。
 
@@ -218,7 +275,93 @@ $$
 = {\color{red}[\hat{y} - y] x_i}\ \ \ \ \ \ \ 
 $$
 
+```python
+def gradientDescent(x, y, theta, alpha, num_iters):
 
+    m = len(x)
+    
+    for i in range(0, num_iters):
+
+        z = np.dot(x, theta)
+        h = sigmoid(z)
+        
+        # Loss function
+        J = -1/m * (np.dot(y.T, np.log(h)) + np.dot((1 - y).T, np.log(1 - h)))
+
+        # Gradient Descent
+        theta = theta - alpha/m * (np.dot(x.T, (h - y)))
+        
+    J = float(J)
+
+    return J, theta
+```
+
+***Input***
+
+`x`: input matrix (m, n+1) (training x)
+
+`y`: corresponging label matrix (m, 1) (training y)
+
+`theta`: initial weight vector (n+1, 1)
+
+`alpha`: learning rate
+
+`num_iters`: max iteration number
+
+***Return***
+
+`J`: cost after training
+
+`theta`: trained weight vector
+    
+<h3> Model Training </h3>
+
+```python
+X = np.zeros((len(train_x), 3))
+
+Y = train_y
+
+for i in range(len(train_x)):
+    X[i, :]= extract_features(train_x[i], freqs)
+
+J, theta = gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, 1500)
+
+t = []
+for i in np.squeeze(theta):
+    t.append(i)
+
+print(f"The cost after training is {J:.8f}.")
+print(f"The resulting vector of weights is {t}")
+```
+`The cost after training is 0.22480686`
+
+`The resulting vector of weights is [6e-08, 0.00053854, -0.00055825]`
+
+
+<h3> Model Testing </h3>
+
+```python
+def test_logistic_regression(test_x, test_y, freqs, theta):
+
+    y_hat = []
+    
+    for tweet in test_x:
+
+        x = extract_features(tweet, freqs)
+        y_pred = sigmoid(np.dot(x, theta))
+        
+        if y_pred > 0.5:
+            y_hat.append(1)
+
+        else:
+            y_hat.append(0)
+
+    accuracy = (y_hat == np.squeeze(test_y)).sum()/len(test_x)
+    
+    return accuracy
+```
+
+`Logistic regression model's accuracy = 0.9950`
 
 ### Reference
 [1] [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/). Dan Jurafsky and James H. Martin Jan 7, 2023
