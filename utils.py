@@ -148,6 +148,7 @@ def gradientDescent(x, y, theta, alpha, num_iters):
         theta = theta - alpha/m * (np.dot(x.T, (h - y)))
         
     J = float(J)
+
     return J, theta
 
 
@@ -197,7 +198,7 @@ def test_logistic_regression(test_x, test_y, freqs, theta):
     return accuracy
 
 
-def confidence_ellipse(x, y, ax, n_std=3.0, facecolor='none', **kwargs):
+def confidence_ellipse(x, y, ax, n_std = 3.0, facecolor='none', **kwargs):
     """
     Create a plot of the covariance confidence ellipse of `x` and `y`
     Parameters

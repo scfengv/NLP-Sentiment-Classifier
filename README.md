@@ -169,7 +169,9 @@ data
 
 
 # Generative and Discriminative Classifiers
-Logistic Regression 和 Naive Bayes 兩者最大的不同在於 Losgistic Regression 屬於 Discriminative Classifiers 而 Naive Bayes 屬於 Generative Classifiers <sub>[1]</sub>。以貓狗分類器作為例子，Generative Classifier 會想去了解貓和狗分別長什麼樣子，而 Discriminative Classifier 只想知道該怎麼去分辨這兩個種類。也可以透過 eq. 1 & 2 來了解兩者的差異，在 Generative Classifier 中，模型會基於 $\color{red}Prior$ 對於資料機率分布的假設 (Ex: Gaussian, Laplacian) 去計算類別的 $\color{blue}Likelihood$，但在 Discriminative Classifier 中，模型則是直接計算事後機率 $P(c|d)$，對資料不進行任何假設。在計算上 Discriminative Classifier 是透過 Gradient Descent 直接將 $w\ (weight),\ b\ (bias)$ 找出，而 Generative Classifier 會利用 Singular Value Decomposition (SVD) 先找出 $U\ (unitary\ matrix)$, $\Sigma\ (rectangular\ matrix)$, $V^*\ (conjugate\ transpose)$，再計算出 $w\ (weight),\ b\ (bias)$。
+Logistic Regression 和 Naive Bayes 兩者最大的不同在於 Losgistic Regression 屬於 Discriminative Classifiers 而 Naive Bayes 屬於 Generative Classifiers <sub>[1]</sub>。
+Discriminative Classifier 著重在分類，在畫出兩個類別中間的邊界線，因此不像 Generative Classifier 會對資料做假設並計算條件機率。Generative Classifier 顧名思義在找出如何可以生成類似於訓練集的資料新資料點的模型，因此更著重於訓練集中類別的資料分布，學習分佈的特性及型態。
+以貓狗分類器作為例子，Generative Classifier 會想去了解貓和狗分別長什麼樣子，而 Discriminative Classifier 只想知道該怎麼去分辨這兩個種類。也可以透過 eq. 1 & 2 來了解兩者的差異，在 Generative Classifier 中，模型會基於 $\color{red}Prior$ 對於資料機率分布的假設 (Ex: Gaussian, Laplacian) 去計算類別的 $\color{blue}Likelihood$ ，但在 Discriminative Classifier 中，模型則是直接計算事後機率 $P(c|d)$ ，對資料不進行任何假設。在計算上 Discriminative Classifier 是透過 Gradient Descent 直接將 $w\ (weight),\ b\ (bias)$ 找出，而 Generative Classifier 會利用 Singular Value Decomposition (SVD) 先找出 $U\ (unitary\ matrix)$, $\Sigma\ (rectangular\ matrix)$ , $V^*\ (conjugate\ transpose)$，再計算出 $w\ (weight),\ b\ (bias)$ 。
 
 $$
 P(c|d) = P(d|c)*\frac{P(c)}{P(d)} \tag{1}
@@ -504,8 +506,36 @@ def test_logistic_regression(test_x, test_y, freqs, theta):
 
 # Naive Bayes
 
+不同於 Logistic Regression 是利用各項的權重去做判別 (等同於繪製一條類別分界線)，在 **Naive Bayes** 模型中，模型會逐字去計算該字為 Positive Sentiment 和 Negative Sentiment 的條件機率 $P(Pos | word)$ ，如 eq. 11 所示，又 $P('happy')$ 並不會因為 Pos / Neg 而改變，故最終 $P(Pos | word)$ 可以簡化為在 Positive Sentiment 下詞彙為 'happy' 的機率 $P('happy'|Positive)$ ，稱為 Likelihood，乘上這個詞彙本身是 Positive Sentiment 的機率 $P(Positive)$ ，稱為 Prior Assumption (eq. 12)。
 
+$$
+P(Positive\ |\ 'happy')=Probability\ of\ {\color{green}{positive}},\ given\ the\ word\ 'happy'\tag{11}
+$$
 
+$$
+=\frac{P(Positive\ \cap\ 'happy')}{P('happy')}\ \ \ 
+$$
+
+$$
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =P('happy'|Positive)*\frac{P(Positive)}{P('happy')}
+$$
+
+$$
+P(Positive\ |\ 'happy') \propto {\color{blue}P('happy'|Positive)} * {\color{red}P(Positive)}\tag{12} 
+$$
+
+$$
+{\color{blue}P('happy'|Positive)}:Likelihood\ \ \ \ \ {\color{red}P(Positive)}:Prior
+$$
+
+Naive Bayes Model 有兩個主要假設：
+
+1. 詞彙所在的位置不重要，模型只會紀錄詞彙的性質 (即條件機率)，而不會紀錄其在 document 中的位置
+2. 各詞彙之間的條件機率是獨立的，表示為 eq. 13
+
+$$
+P(f_1, f_2,......f_n | c) = P(f_1 | c) * P(f_2 | c) * ... * P(f_n | c) \tag{13}
+$$
 
 
 ### Reference
