@@ -125,7 +125,7 @@ def sigmoid(z):
 ```
 **The Cross-Entropy Loss Function**
 
-在 Logistic Regression 中用來量化模型表現的方式為去計算 Classifier output ($\hat{y}=\sigma(w \cdot x +b)$) 和 Real output (y = 0 or 1, Bernoulli distribution) 之間的距離，稱為 Cost Function 或 Cross-Entropy Loss Function，在一個理想的情況下，一個完美的 Classifier 會 assign $P(y|x) = 1$ 給 $y = 1$，反之 $P(y|x) = 0$ 給 $y = 0$，藉由計算 $\hat{y}$ 和 y 之間的差距。
+在 Logistic Regression 中用來量化模型表現的方式為去計算 Classifier output ($\hat{y}=\sigma(w \cdot x +b)$) 和 Real output (y = 0 or 1, Bernoulli distribution) 之間的距離 (在 Gradient Descent 的部分有更詳細的說明)，稱為 Cost Function 或 Cross-Entropy Loss Function，在一個理想的情況下，一個完美的 Classifier 會 assign $P(y|x) = 1$ 給 $y = 1$，反之 $P(y|x) = 0$ 給 $y = 0$，藉由計算 $\hat{y}$ 和 y 之間的差距。
 由於結果的二元離散分佈特性，故可以將模型做出正確決定的機率 $P(y|x)$ 表達為 eq. 6，將其取 Log 可得到更直觀的 eq. 7，以機率的觀念會希望求得 $\hat{y}$ 使 $\log(P(y|x))$ 最大，但在 Loss Function 的觀念中會希望越小越好，故將 $\log(P(y|x))$ 加一個負號 (eq. 8)，帶入 Sigmoid Function 即可得到 **Logistic Regression 中的 Loss Function** (eq. 9)。
 $$
 P(y|x) =  \hat{y}^y\ (1 - \hat{y})^{1-y}\tag{6}
@@ -141,11 +141,11 @@ $$
 $$
 
 $$
-\tag{8} L(\hat{y}, y) = -\log(P(y|x)) = - [\ y \log \hat{y} + (1-y) \log(1- \hat{y})\ ]
+\tag{8} L(\hat{y}_i, y_i) = -\log(P(y|x)) = - [\ y \log \hat{y} + (1-y) \log(1- \hat{y})\ ]
 $$
 
 $$
-\tag{9} L(\hat{y}, y) = -\log(P(y|x)) = - [\ y \log (\sigma(w \cdot x +b)) + (1-y) \log(1- \sigma(w \cdot x +b))\ ]
+\tag{9} L(\hat{y}_i, y_i) = -\log(P(y|x)) = - [\ y \log (\sigma(w \cdot x +b)) + (1-y) \log(1- \sigma(w \cdot x +b))\ ]
 $$
 
 若再將 Loss Function 做細部的拆解的話可以發現其實是由兩個部分所貢獻，分別是當 $y = 1$ 時主導的 $y \log \hat{y}$ 和 當 $y = 0$ 時主導的 $(1-y) \log(1- \hat{y})$，而兩部分的分析如下。
@@ -156,7 +156,7 @@ $$
 | 1 | any | 0 |
 
 
-| y | $\hat{y}$ | $y \log \hat{y}$ |
+| y | $\hat{y}$ | $y \log \hat{y}$
 | --- | --- | --- |
 | 0 | any | 0 |
 | 1 | 0.99 | ~0 |
@@ -165,7 +165,59 @@ $$
 | y | $\hat{y}$ | $(1-y) \log(1- \hat{y})$ |
 | --- | --- | --- |
 | 1 | any | 0 |
-| 0 | 0.01 | ~0 |
+| 0 | 0.01 | ~0 | 
 | 0 | ~1 | $-\infty$ |
+
+
+**Gradient Descent**
+
+Gradient Descent 的目的是在找出一個理想的 $w_i$ 可以使 Loss Function 最小 (eq. 10)，以微積分的角度，梯度的方向是 Loss Function 在權重 $w_i$ 時的最大增加方向，量則是此方向上的增加量。
+
+在做 Gradient Descent 的過程中，會先找出在權重 $w_i$ 下 Loss Function 的梯度方向，並嘗試往反方向移動，即可達到降低 Loss 的效果 (eq. 11)。由推導結果可以發現，梯度對於某 $i$ 變量的權重 $w_i$ 可以簡單表示為 Estimated $\hat{y}$ 和 True $y$ 之間的差距乘上 input value $x_i$。
+
+Gradient Descent 的另一個參數 $\eta$ 是模型的 Learning rate，是一個需要被調整的超參數，可以視為模型在找到梯度方向後需要跨多大步，若 Learning rate 太大，會導致模型在 minimum Loss 的兩端來回遊走找不到最低點進而導致結果無法收斂 (稱為 Overshoot)，反之若 Learning rate 太小，則會導致模型學習速度太慢。常見的作法為先使用 High Learning rate 找到相對低點後，再將其慢慢降低。
+
+$$
+\tag{10} \hat{w} =  {\arg\min_{w}} \frac{1}{m} \sum_{i=1}^m L(f(w_i, x_i), y_i)
+$$
+
+$$
+\tag{11} w^{t+1} = w^t - \eta \nabla L(f(w_i, x_i), y_i)
+$$
+
+$$
+\nabla L(f(w_i, x_i), y_i) = 
+\begin{bmatrix}
+\frac{\partial}{\partial w_1}L\\
+\frac{\partial}{\partial w_2}L\\
+.\\
+.\\
+\frac{\partial}{\partial w_n}L\\
+\end{bmatrix}
+$$
+
+$$
+\frac{\partial}{\partial w_i}L = \frac{-\partial}{\partial w_i} [\ y \log (\sigma(w \cdot x +b)) + (1-y) \log(1- \sigma(w \cdot x +b))\ ]
+$$
+
+$$
+\frac{\partial}{\partial w_i}L = -\frac{y}{\sigma(w \cdot x +b)} \frac{\partial}{\partial w_i} (\sigma (w \cdot x +b)) - \frac{(1-y)}{1- \sigma(w \cdot x +b)} \frac{\partial}{\partial w_i}(1- \sigma(w \cdot x +b))
+$$
+
+$$
+\frac{\partial}{\partial w_i}L = -[\frac{y}{\sigma(w \cdot x +b)} - \frac{(1-y)}{1- \sigma(w \cdot x +b)}]\  \frac{\partial}{\partial w_i} (\sigma (w \cdot x +b))
+$$
+
+$$
+After\ some\ complicate\ algebra...
+$$
+
+$$
+\frac{\partial}{\partial w_i}L = [\sigma (w \cdot x +b)-y]x_i \\
+= {\color{red}[\hat{y} - y] x_i}\ \ \ \ \ \ \ 
+$$
+
+
+
 ### Reference
 [1] [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/). Dan Jurafsky and James H. Martin Jan 7, 2023
