@@ -190,7 +190,7 @@ def sigmoid(z):
 ```
 <h3>The Cross-Entropy Loss Function</h3>
 
-在 Logistic Regression 中用來量化模型表現的方式為去計算 Classifier output ($\hat{y}=\sigma(w \cdot x +b)$) 和 Real output (y = 0 or 1, Bernoulli distribution) 之間的距離 (在 Gradient Descent 的部分有更詳細的說明)，稱為 Cost Function 或 Cross-Entropy Loss Function，在一個理想的情況下，一個完美的 Classifier 會 assign $P(y|x) = 1$ 給 $y = 1$，反之 $P(y|x) = 0$ 給 $y = 0$，藉由計算 $\hat{y}$ 和 y 之間的差距。
+在 Logistic Regression 中用來量化模型表現的方式為去計算 Classifier output ( $\hat{y}=\sigma(w \cdot x +b)$ ) 和 Real output (y = 0 or 1, Bernoulli distribution) 之間的距離 (在 Gradient Descent 的部分有更詳細的說明)，稱為 Cost Function 或 Cross-Entropy Loss Function，在一個理想的情況下，一個完美的 Classifier 會 assign $P(y|x) = 1$ 給 $y = 1$，反之 $P(y|x) = 0$ 給 $y = 0$，藉由計算 $\hat{y}$ 和 y 之間的差距。
 由於結果的二元離散分佈特性，故可以將模型做出正確決定的機率 $P(y|x)$ 表達為 eq. 6，將其取 Log 可得到更直觀的 eq. 7，以機率的觀念會希望求得 $\hat{y}$ 使 $\log(P(y|x))$ 最大，但在 Loss Function 的觀念中會希望越小越好，故將 $\log(P(y|x))$ 加一個負號 (eq. 8)，帶入 Sigmoid Function 即可得到 **Logistic Regression 中的 Loss Function** (eq. 9)。
 
 $$
