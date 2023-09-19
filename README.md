@@ -506,6 +506,8 @@ def test_logistic_regression(test_x, test_y, freqs, theta):
 
 # Naive Bayes
 
+<h3> Conditional Probability</h3>
+
 不同於 Logistic Regression 是利用各項的權重去做判別 (等同於繪製一條類別分界線)，在 **Naive Bayes** 模型中，模型會逐字去計算該字為 Positive Sentiment 和 Negative Sentiment 的條件機率 $P(Pos | word)$ ，如 eq. 11 所示，又 $P('happy')$ 並不會因為 Pos / Neg 而改變，故最終 $P(Pos | word)$ 可以簡化為在 Positive Sentiment 下詞彙為 'happy' 的機率 $P('happy'|Positive)$ ，稱為 Likelihood，乘上這個詞彙本身是 Positive Sentiment 的機率 $P(Positive)$ ，稱為 Prior Assumption (eq. 12)。
 
 $$
@@ -528,6 +530,8 @@ $$
 {\color{blue}P('happy'|Positive)}:Likelihood\ \ \ \ \ {\color{red}P(Positive)}:Prior
 $$
 
+<h3> Naive Bayes Assumption </h3>
+
 Naive Bayes Model 有兩個主要假設：
 
 1. 詞彙所在的位置不重要，模型只會紀錄詞彙的性質 (即條件機率)，而不會紀錄其在 document 中的位置
@@ -536,6 +540,13 @@ Naive Bayes Model 有兩個主要假設：
 $$
 P(f_1, f_2,......f_n | c) = P(f_1 | c) * P(f_2 | c) * ... * P(f_n | c) \tag{13}
 $$
+
+<h3> Naive Bayes Model </h3>
+
+在開始做計算之前，Naive Bayes Model 會先將詞彙匯集成一袋的文字並統計各詞彙分別在 Positive / Negative Sentiment 句子中出現的次數，即可計算該詞彙的 Likelihood
+
+
+
 
 
 ### Reference
