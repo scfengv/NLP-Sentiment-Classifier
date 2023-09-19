@@ -163,7 +163,7 @@ $$
 在 NLP 中 Logistic Regression 是一個很基礎的監督式學習分類演算法，神經網路即是由一系列的 Logistic Regression Classifiers 堆疊而成的。
 
 在 **Logistic Regression** 模型中，首先將每句 Tweets 經過資料前處理後，組成一個擁有所有詞彙 (令有 m 個不同詞彙) 的 Vocabulary。
-在計算特定詞彙在 Positive Tweets 和 Negative Tweets 中分別出現的次數後，每個詞彙會形成一個 (1x3) 的矩陣，分別是 bias、在 Postive 中的詞頻、在 Negative 中的詞頻 $[1\ (bias),\ pos,\ neg]$，所有詞彙彙整成一個矩陣會組成一個 (mx3) 的 input matrix (training X)。放入模型後模型會分別計算一個權重 $w_i$ 表示該 $x_i$ 對於分類的重要性 (這個 Case 中為 $w_1x_1\ (pos)$, $w_2x_2\ (neg)$ )。為了要達到成功預測，模型會計算一個 $z$ 值 (eq. 3) 以量化分類結果，此時 $z$ 會介於負無限到正無限之間 $z \in (-\infty, \infty)$，為了可以用機率的形式表示，將 $z$ 放入 Sigmoid Function (eq. 4) 後得到 $\sigma(z) \in (0,1)$ ，即可用來代表此字彙屬於 Positive sentiment 的機率 (Negative = 1 - $\sigma(z)$)。Logistic Regression 做決策的過程如 eq. 5，若計算出來的 $\sigma(z)>0.5$，則會將其分類到 $y = 1$ (Positive sentiment)，反之則會被分類到 $y = 0$ (Negative sentiment)。
+在計算特定詞彙在 Positive Tweets 和 Negative Tweets 中分別出現的次數後，每個詞彙會形成一個 (1x3) 的矩陣，分別是 bias、在 Postive 中的詞頻、在 Negative 中的詞頻 $[1\ (bias),\ pos,\ neg]$，所有詞彙彙整成一個矩陣會組成一個 (mx3) 的 input matrix (training X)。放入模型後模型會分別計算一個權重 $w_i$ 表示該 $x_i$ 對於分類的重要性 (這個 Case 中為 $w_1x_1\ (pos)$, $w_2x_2\ (neg)$ )。為了要達到成功預測，模型會計算一個 $z$ 值 (eq. 3) 以量化分類結果，此時 $z$ 會介於負無限到正無限之間 $z \in (-\infty, \infty)$ ，為了可以用機率的形式表示，將 $z$ 放入 Sigmoid Function (eq. 4) 後得到 $\sigma(z) \in (0,1)$ ，即可用來代表此字彙屬於 Positive sentiment 的機率 (Negative = 1 - $\sigma(z)$)。Logistic Regression 做決策的過程如 eq. 5，若計算出來的 $\sigma(z)>0.5$，則會將其分類到 $y = 1$ (Positive sentiment)，反之則會被分類到 $y = 0$ (Negative sentiment)。
 
 $$
 z = (\sum_{i=1}^n w_ix_i)+b = w \cdot x+b \tag{3}
