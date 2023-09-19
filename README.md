@@ -124,6 +124,28 @@ def build_freqs(tweets, ys):
 Which means that there are 81 positive tweets contain 'pleas'
 
 ```python
+{('followfriday', 1.0): 23,
+ ('france_int', 1.0): 1,
+ ('pkuchli', 1.0): 1,
+ ('57', 1.0): 2,
+ ('milipol_pari', 1.0): 1,
+ ('top', 1.0): 30,
+ ('engag', 1.0): 7,
+ ('member', 1.0): 14,
+ ('commun', 1.0): 27,
+ ('week', 1.0): 72,
+ (':)', 1.0): 2960,
+ ('lamb', 1.0): 1,
+ ('2ja', 1.0): 1,
+ ('hey', 1.0): 60,
+ ('jame', 1.0): 7,
+ ('odd', 1.0): 2,
+ (':/', 1.0): 5,
+ ('pleas', 1.0): 81}
+ ```
+
+
+```python
 keys = ['''words that are interested''']
 
 data = []
@@ -143,6 +165,8 @@ for word in keys:
     
 data
 ```
+(graph)
+
 
 # Generative and Discriminative Classifiers
 Logistic Regression 和 Naive Bayes 兩者最大的不同在於 Losgistic Regression 屬於 Discriminative Classifiers 而 Naive Bayes 屬於 Generative Classifiers <sub>[1]</sub>。以貓狗分類器作為例子，Generative Classifier 會想去了解貓和狗分別長什麼樣子，而 Discriminative Classifier 只想知道該怎麼去分辨這兩個種類。也可以透過 eq. 1 & 2 來了解兩者的差異，在 Generative Classifier 中，模型會基於 $\color{red}Prior$ 對於資料機率分布的假設 (Ex: Gaussian, Laplacian) 去計算類別的 $\color{blue}Likelihood$，但在 Discriminative Classifier 中，模型則是直接計算事後機率 $P(c|d)$，對資料不進行任何假設。在計算上 Discriminative Classifier 是透過 Gradient Descent 直接將 $w\ (weight),\ b\ (bias)$ 找出，而 Generative Classifier 會利用 Singular Value Decomposition (SVD) 先找出 $U\ (unitary\ matrix)$, $\Sigma\ (rectangular\ matrix)$, $V^*\ (conjugate\ transpose)$，再計算出 $w\ (weight),\ b\ (bias)$。
@@ -185,7 +209,9 @@ $$
 
 ```python
 def sigmoid(z): 
-    h = 1/(1 + np.exp(-z))    
+
+    h = 1/(1 + np.exp(-z))   
+
     return h
 ```
 <h3>The Cross-Entropy Loss Function</h3>
@@ -345,6 +371,108 @@ print(f"The resulting vector of weights is {t}")
 
 `The resulting vector of weights is [6e-08, 0.00053854, -0.00055825]`
 
+<h3> Validation </h3>
+
+```python
+def predict_tweet(tweet, freqs, theta):
+
+    x = extract_features(tweet, freqs)
+
+    y_pred = sigmoid(np.dot(x, theta))
+    
+    return y_pred
+```
+
+**Generate the sentences with the help of ChatGPT lol**
+
+```python
+vali_tweet = [
+
+    "Another day, another opportunity.",
+
+    "Do the right things, do things right.",
+
+    "Celebrate the journey, not just the destination.",
+
+    "Every sunset is an opportunity to reset.",
+
+    "Stars can't shine without darkness.",
+
+    "Inhale courage, exhale fear.",
+
+    "Radiate kindness like sunshine.",
+
+    "Find beauty in the ordinary.",
+
+    "Chase your wildest dreams with the heart of a lion.",
+
+    "Life is a canvas; make it a masterpiece.",
+
+    "Let your soul sparkle.",
+
+    "Create your own sunshine.", 
+
+    "This summer would not be perfect without you." ]
+
+
+for tweet in vali_tweet:
+    print(process_tweet(tweet))
+    print('%s -> %f' % (tweet, predict_tweet(tweet, freqs, theta)))
+    print('\n')
+```
+
+```python
+Stem: ['anoth', 'day', 'anoth', 'opportun']
+Another day, another opportunity. -> 0.510559
+
+
+Stem: ['right', 'thing', 'thing', 'right']
+Do the right things, do things right. -> 0.499711
+
+
+Stem: ['celebr', 'journey', 'destin']
+Celebrate the journey, not just the destination. -> 0.500105
+
+
+Stem: ['everi', 'sunset', 'opportun', 'reset']
+Every sunset is an opportunity to reset. -> 0.503571
+
+
+Stem: ['star', 'shine', 'without', 'dark']
+Stars can not shine without darkness. -> 0.499319
+
+
+Stem: ['inhal', 'courag', 'exhal', 'fear']
+Inhale courage, exhale fear. -> 0.499990
+
+
+Stem: ['radiat', 'kind', 'like', 'sunshin']
+Radiate kindness like sunshine. -> 0.502006
+
+
+Stem: ['find', 'beauti', 'ordinari']
+Find beauty in the ordinary. -> 0.501479
+
+
+Stem: ['chase', 'wildest', 'dream', 'heart', 'lion']
+Chase your wildest dreams with the heart of a lion. -> 0.497504
+
+
+Stem: ['life', 'canva', 'make', 'masterpiec']
+Life is a canvas; make it a masterpiece. -> 0.497933
+
+
+Stem: ['let', 'soul', 'sparkl']
+Let your soul sparkle. -> 0.505347
+
+
+Stem: ['creat', 'sunshin']
+Create your own sunshine. -> 0.501052
+
+
+Stem: ['summer', 'would', 'perfect', 'without']
+This summer would not be perfect without you. -> 0.502120
+```
 
 <h3> Model Testing </h3>
 
@@ -370,6 +498,12 @@ def test_logistic_regression(test_x, test_y, freqs, theta):
 ```
 
 `Logistic regression model's accuracy = 0.9950`
+
+# Naive Bayes
+
+
+
+
 
 ### Reference
 [1] [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/). Dan Jurafsky and James H. Martin Jan 7, 2023
