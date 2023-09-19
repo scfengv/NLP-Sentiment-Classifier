@@ -1,6 +1,14 @@
 # Sentiment Classifier with Logistic Regression and Naive Bayes
 
 ## Content
+- Abstract
+- Data Preprocessing
+- Generative and Discriminative Classifiers
+- Logistic Regression
+    - The Cross-Entropy Loss Function
+    - Gradient Descent
+- Naive Bayes
+- Reference
 
 # Abstract
 
