@@ -8,10 +8,11 @@
     - The Cross-Entropy Loss Function
     - Gradient Descent
 - Naive Bayes
+    - Conditional Probability
 - Reference
 
 # Abstract
-
+本文將探討 Discriminative 和 Generative Algorithms 作為 Natural Language Sentiment Classifier 時的原理和分類模式，將用一點點的代數、機率和微積分加以佐證，內容包括了 Maximum Likelihood Estimation, Cross-Entropy Loss Function, Gradient Descent 和 Conditional Probability。
 
 # Introduction
 本文使用的是 `nltk` 中的 `twitter_samples` [資料集](https://www.nltk.org/howto/twitter.html)。共有 Positive Tweets 和 Negative Tweets 各 5000 筆真實 Twitter 平台上的資料，共 10000 筆。下面我將利用 Logistic Regression 中的 Sigmoid Function 和 Naive Bayes 兩種截然不同的分類方法試圖透過 Natural Laguage Processing 的方式做出 Tweets Sentiment Classifier。
