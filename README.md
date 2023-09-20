@@ -353,30 +353,14 @@ def gradientDescent(x, y, theta, alpha, num_iters):
 
 `theta`: trained weight vector
     
-<h3> Model Training </h3>
+
+<h3> Tuning Parameter </h3>
 
 ```python
 X = np.zeros((len(train_x), 3))
 
 Y = train_y
-
-for i in range(len(train_x)):
-    X[i, :]= extract_features(train_x[i], freqs)
-
-J, theta = gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, 1500)
-
-t = []
-for i in np.squeeze(theta):
-    t.append(i)
-
-print(f"The cost after training is {J:.8f}.")
-print(f"The resulting vector of weights is {t}")
 ```
-`The cost after training is 0.22480686`
-
-`The resulting vector of weights is [6e-08, 0.00053854, -0.00055825]`
-
-<h3> Tuning Parameter </h3>
 
 ```python
 alpha_values = [1e-8, 1e-9, 1e-10, 1e-11, 1e-12]
@@ -443,6 +427,26 @@ alpha = 1e-12, iter = 1000000 Calculated, Cost = 0.2772, Time elapsed: 683.42 se
 ```
 (image)
 
+<h3> Model Training </h3>
+
+```python
+for i in range(len(train_x)):
+    X[i, :]= extract_features(train_x[i], freqs)
+
+J, theta = gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, int(1e4))
+
+t = []
+for i in np.squeeze(theta):
+    t.append(i)
+
+print(f"The cost after training is {J:.8f}.")
+print(f"The resulting vector of weights is {t}")
+```
+
+`The cost after training is 0.10133100`
+
+`The resulting vector of weights is [3e-07, 0.00127474, -0.0011083]`
+
 <h3> Validation </h3>
 
 ```python
@@ -495,55 +499,55 @@ for tweet in vali_tweet:
 
 ```python
 Stem: ['anoth', 'day', 'anoth', 'opportun']
-Another day, another opportunity. -> 0.510559
+Another day, another opportunity. -> 0.533046
 
 
 Stem: ['right', 'thing', 'thing', 'right']
-Do the right things, do things right. -> 0.499711
+Do the right things, do things right. -> 0.508265
 
 
 Stem: ['celebr', 'journey', 'destin']
-Celebrate the journey, not just the destination. -> 0.500105
+Celebrate the journey, not just the destination. -> 0.500568
 
 
 Stem: ['everi', 'sunset', 'opportun', 'reset']
-Every sunset is an opportunity to reset. -> 0.503571
+Every sunset is an opportunity to reset. -> 0.509145
 
 
 Stem: ['star', 'shine', 'without', 'dark']
-Stars can not shine without darkness. -> 0.499319
+Stars can not shine without darkness. -> 0.499932
 
 
 Stem: ['inhal', 'courag', 'exhal', 'fear']
-Inhale courage, exhale fear. -> 0.499990
+Inhale courage, exhale fear. -> 0.500083
 
 
 Stem: ['radiat', 'kind', 'like', 'sunshin']
-Radiate kindness like sunshine. -> 0.502006
+Radiate kindness like sunshine. -> 0.515079
 
 
 Stem: ['find', 'beauti', 'ordinari']
-Find beauty in the ordinary. -> 0.501479
+Find beauty in the ordinary. -> 0.506431
 
 
 Stem: ['chase', 'wildest', 'dream', 'heart', 'lion']
-Chase your wildest dreams with the heart of a lion. -> 0.497504
+Chase your wildest dreams with the heart of a lion. -> 0.496330
 
 
 Stem: ['life', 'canva', 'make', 'masterpiec']
-Life is a canvas; make it a masterpiece. -> 0.497933
+Life is a canvas; make it a masterpiece. -> 0.501446
 
 
 Stem: ['let', 'soul', 'sparkl']
-Let your soul sparkle. -> 0.505347
+Let your soul sparkle. -> 0.514518
 
 
 Stem: ['creat', 'sunshin']
-Create your own sunshine. -> 0.501052
+Create your own sunshine. -> 0.502758
 
 
 Stem: ['summer', 'would', 'perfect', 'without']
-This summer would not be perfect without you. -> 0.502120
+This summer would not be perfect without you. -> 0.509757
 ```
 
 <h3> Model Testing </h3>
@@ -649,6 +653,176 @@ Sentiment =
 $$
 
 (image: normal ratio V. Log Likelihood)
+
+總結以上，Naive Bayes Model 大致可以分成 4 個步驟，分別是
+
+1. 文本前處理 (Cleaning, Word frequency count) (Rewind the **Data Preprocessing** part) 
+2. 資料處理
+    - Conditional Probability
+    - Laplacian Smoothing
+    - Log Likelihood & Log Prior
+3. 計算並預測 Sentiment
+
+**資料處理**
+
+```python
+def train_naive_bayes(freqs, train_x, train_y):
+    
+    data = {'word': [], 'positive': [], 'negative': [], 'sentiment': []}
+    loglikelihood = {}
+    logprior = 0
+
+    # Calculate V, the number of unique words in the vocabulary
+    vocab = set([pair[0] for pair in freqs.keys()])
+    V = len(vocab)
+
+    N_pos = N_neg = 0
+
+    # Calculate Prior
+    for pair in freqs.keys():
+        if pair[1] > 0:
+            N_pos += freqs[pair]
+        else:
+            N_neg += freqs[pair]
+
+    D = len(train_y)
+    D_pos = len(list(filter(lambda x: x > 0, train_y)))
+    D_neg = len(list(filter(lambda x: x <= 0, train_y)))
+
+    logprior = np.log(D_pos) - np.log(D_neg)
+
+    # Calculate Likelihood
+    for word in vocab:
+        freq_pos = lookup(freqs, word, 1)
+        freq_neg = lookup(freqs, word, 0)
+
+        # Laplacian Smoothing
+        p_w_pos = (freq_pos + 1) / (N_pos + V)
+        p_w_neg = (freq_neg + 1) / (N_neg + V)
+
+        loglikelihood[word] = np.log(p_w_pos) - np.log(p_w_neg)
+
+        if p_w_pos > p_w_neg:
+            sentiment = 1
+        else:
+            sentiment = 0
+
+        data['word'].append(word)
+        data['positive'].append(np.log(p_w_pos))
+        data['negative'].append(np.log(p_w_neg))
+        data['sentiment'].append(sentiment)
+
+    return logprior, loglikelihood, data
+```
+
+```python
+LogPrior: 0.0  # Stands for pos/neg Balanced Dataset
+Likelihood:
+{'easili': -0.452940736126882,
+ 'melodi': 0.6456715525412289,
+ 'ohstylesss': 0.6456715525412289,
+ 'steelseri': -0.7406228085786619,
+ 'harsh': -0.7406228085786619,
+ 'weapon': -0.452940736126882,
+ 'maxdjur': -0.7406228085786619,
+ 'thalaivar': 0.6456715525412289,
+ 'theroyalfactor': 0.6456715525412289,
+ 'fought': 0.6456715525412289,
+ 'louisemensch': -0.7406228085786619,
+ 'hayli': 0.6456715525412289}
+```
+
+**計算並預測 Sentiment**
+
+**Validation with ChatGPT tweet again**
+
+```python
+def naive_bayes_predict(tweet, logprior, loglikelihood):
+
+    word_l = process_tweet(tweet)
+
+    p = 0
+    p += logprior
+
+    for word in word_l:
+        if word in loglikelihood:
+
+            p += loglikelihood[word]
+
+    return p
+```
+
+```python
+Tweets: Another day, another opportunity.
+Stem: ['anoth', 'day', 'anoth', 'opportun']
+Another day, another opportunity. -> 2.267723
+
+
+Tweets: Do the right things, do things right.
+Stem: ['right', 'thing', 'thing', 'right']
+Do the right things, do things right. -> -0.122857
+
+
+Tweets: Celebrate the journey, not just the destination.
+Stem: ['celebr', 'journey', 'destin']
+Celebrate the journey, not just the destination. -> -0.324748
+
+
+Tweets: Every sunset is an opportunity to reset.
+Stem: ['everi', 'sunset', 'opportun', 'reset']
+Every sunset is an opportunity to reset. -> 2.054798
+
+
+Tweets: Stars can not shine without darkness.
+Stem: ['star', 'shine', 'without', 'dark']
+Stars can not shine without darkness. -> 0.572238
+
+
+Tweets: Inhale courage, exhale fear.
+Stem: ['inhal', 'courag', 'exhal', 'fear']
+Inhale courage, exhale fear. -> -0.142427
+
+
+Tweets: Radiate kindness like sunshine.
+Stem: ['radiat', 'kind', 'like', 'sunshin']
+Radiate kindness like sunshine. -> 1.410585
+
+
+Tweets: Find beauty in the ordinary.
+Stem: ['find', 'beauti', 'ordinari']
+Find beauty in the ordinary. -> 1.288319
+
+
+Tweets: Chase your wildest dreams with the heart of a lion.
+Stem: ['chase', 'wildest', 'dream', 'heart', 'lion']
+Chase your wildest dreams with the heart of a lion. -> -1.379487
+
+
+Tweets: Life is a canvas; make it a masterpiece.
+Stem: ['life', 'canva', 'make', 'masterpiec']
+Life is a canvas; make it a masterpiece. -> 0.917726
+
+
+Tweets: Let your soul sparkle.
+Stem: ['let', 'soul', 'sparkl']
+Let your soul sparkle. -> 1.488666
+
+
+Tweets: Create your own sunshine.
+Stem: ['creat', 'sunshin']
+Create your own sunshine. -> 1.445494
+
+
+Tweets: This summer would not be perfect without you.
+Stem: ['summer', 'would', 'perfect', 'without']
+This summer would not be perfect without you. -> 1.041158
+```
+
+
+
+
+`Naive Bayes model's accuracy = 0.9950`
+
 
 
 ### Reference
