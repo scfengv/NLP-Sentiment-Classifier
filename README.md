@@ -187,6 +187,11 @@ $$
 {\color{blue}P(d|c)}:Likelihood\ \ \ \ \ {\color{red}P(c)}:Prior
 $$
 
+<img width="450" src="https://github.com/scfengv/NLP-Sentiment-Classifier/assets/123567363/de0fa343-c417-48cb-b0c9-df2f53543a35">
+<img width="450" src="https://github.com/scfengv/NLP-Sentiment-Classifier/assets/123567363/08001ec2-335e-4b24-9659-0445cb165dc6">
+
+
+
 # Logistic Regression
 在 NLP 中 Logistic Regression 是一個很基礎的監督式學習分類演算法，神經網路即是由一系列的 Logistic Regression Classifiers 堆疊而成的。
 
