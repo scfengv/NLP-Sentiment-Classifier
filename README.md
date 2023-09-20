@@ -166,7 +166,8 @@ for word in keys:
     
 data
 ```
-(graph)
+
+<img width="700" src="https://github.com/scfengv/NLP-Sentiment-Classifier/assets/123567363/fa9c8c2f-9eef-4853-a1c6-01c749816ce5">
 
 
 # Generative and Discriminative Classifiers
@@ -420,7 +421,9 @@ alpha = 1e-12, iter = 10000 Calculated, Cost = 0.6819, Time elapsed: 7.58 sec
 alpha = 1e-12, iter = 50000 Calculated, Cost = 0.6404, Time elapsed: 33.33 sec
 alpha = 1e-12, iter = 1000000 Calculated, Cost = 0.2772, Time elapsed: 683.42 sec
 ```
-(image)
+
+![下載 (1)](https://github.com/scfengv/NLP-Sentiment-Classifier/assets/123567363/e895c4c7-f8f4-4edf-97b1-0c3a12e8cefa)
+
 
 從 Tuning Parameter 的過程中可以看到，隨著迭代次數的上升，Cost 和 Time elapsed 之間存在著取捨的關係，且所需時間隨著迭代次數呈指數上升。Cost 來到最低的 0.1013 的有兩組，分別是 `alpha = 1e-09, iter = 10000, time = 5.81 sec` , `alpha = 1e-11, iter = 1000000, time = 682.91 sec`，最後在時間成本的考量下我在後面的 Model Training 中選擇了 `alpha = 1e-09, iter = 10000` 這組參數。可以特別注意的是在 `alpha = 1e-12` 這組中，在 `iter < 50000` 的情況下 Cost 都還非常的大，原因是因為 Learning Rate 實在是太小了，導致 Gradient Descent 的速率太慢，一直到 `iter = 1000000` Cost 才下降到平均水準。
 
@@ -629,6 +632,7 @@ $$
 V: Unique\ words\ in\ whole\ document\ (V=8)
 $$
 
+<img width="700" alt="截圖 2023-09-12 20 24 43" src="https://github.com/scfengv/NLP-Sentiment-Classifier/assets/123567363/f371e30c-6772-4a05-bed5-82abddb74376">
 
 $$
 \tag{15} Sentiment =  \frac{P(pos)}{P(neg)} * \frac{P(w_i|pos)}{P(w_i|neg)}
@@ -649,7 +653,7 @@ Sentiment =
 \end{cases}\tag{5}
 $$
 
-(image: normal ratio V. Log Likelihood)
+<img width="1500" alt="截圖 2023-09-12 20 24 43" src="https://github.com/scfengv/NLP-Sentiment-Classifier/assets/123567363/cfc07adf-8afa-4144-a9de-739e29e5345c">
 
 總結以上，Naive Bayes Model 大致可以分成 4 個步驟，分別是
 
