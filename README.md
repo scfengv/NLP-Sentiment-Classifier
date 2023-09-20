@@ -376,6 +376,73 @@ print(f"The resulting vector of weights is {t}")
 
 `The resulting vector of weights is [6e-08, 0.00053854, -0.00055825]`
 
+<h3> Tuning Parameter </h3>
+
+```python
+alpha_values = [1e-8, 1e-9, 1e-10, 1e-11, 1e-12]
+num_iters_values = [1000, 5000, 10000, 50000, 1000000]
+
+cost_values = np.empty((len(alpha_values), len(num_iters_values)))
+
+for i, alpha in enumerate(alpha_values):
+    for j, num_iters in enumerate(num_iters_values):
+
+        start_time = time.time()
+        J, _ = gradientDescent(X, Y, np.zeros((3, 1)), alpha, int(num_iters))
+
+        end_time = time.time()
+        time_consume = end_time - start_time
+
+        cost_values[i, j] = J
+        print(f'alpha = {alpha}, iter = {num_iters} Calculated, Cost = {J:.4f}, Time elapsed: {time_consume:.2f} sec')
+    
+    print('---------------------------------------------')
+
+plt.figure(figsize = (10, 6))
+contour = plt.contourf(np.log10(alpha_values), num_iters_values, cost_values, levels = 20, cmap = 'viridis')
+plt.colorbar(contour, label = 'Cost (J)')
+
+plt.xlabel('log10(Learning Rate alpha)')
+plt.ylabel('Number of Iterations (num_iters)')
+
+plt.title('Cost vs. Learning Rate and Number of Iterations')
+
+plt.show()
+```
+
+```python
+alpha = 1e-08, iter = 1000 Calculated, Cost = 0.1013, Time elapsed: 1.37 sec
+alpha = 1e-08, iter = 5000 Calculated, Cost = nan, Time elapsed: 3.08 sec
+alpha = 1e-08, iter = 10000 Calculated, Cost = nan, Time elapsed: 5.87 sec
+alpha = 1e-08, iter = 50000 Calculated, Cost = nan, Time elapsed: 38.60 sec
+alpha = 1e-08, iter = 1000000 Calculated, Cost = nan, Time elapsed: 676.10 sec
+---------------------------------------------
+alpha = 1e-09, iter = 1000 Calculated, Cost = 0.2773, Time elapsed: 0.63 sec
+alpha = 1e-09, iter = 5000 Calculated, Cost = 0.1286, Time elapsed: 2.89 sec
+alpha = 1e-09, iter = 10000 Calculated, Cost = 0.1013, Time elapsed: 5.81 sec
+alpha = 1e-09, iter = 50000 Calculated, Cost = nan, Time elapsed: 34.93 sec
+alpha = 1e-09, iter = 1000000 Calculated, Cost = nan, Time elapsed: 670.09 sec
+---------------------------------------------
+alpha = 1e-10, iter = 1000 Calculated, Cost = 0.5952, Time elapsed: 0.58 sec
+alpha = 1e-10, iter = 5000 Calculated, Cost = 0.3847, Time elapsed: 2.94 sec
+alpha = 1e-10, iter = 10000 Calculated, Cost = 0.2773, Time elapsed: 7.85 sec
+alpha = 1e-10, iter = 50000 Calculated, Cost = 0.1286, Time elapsed: 33.51 sec
+alpha = 1e-10, iter = 1000000 Calculated, Cost = nan, Time elapsed: 700.17 sec
+---------------------------------------------
+alpha = 1e-11, iter = 1000 Calculated, Cost = 0.6820, Time elapsed: 0.62 sec
+alpha = 1e-11, iter = 5000 Calculated, Cost = 0.6404, Time elapsed: 2.93 sec
+alpha = 1e-11, iter = 10000 Calculated, Cost = 0.5951, Time elapsed: 7.89 sec
+alpha = 1e-11, iter = 50000 Calculated, Cost = 0.3847, Time elapsed: 33.50 sec
+alpha = 1e-11, iter = 1000000 Calculated, Cost = 0.1013, Time elapsed: 682.91 sec
+---------------------------------------------
+alpha = 1e-12, iter = 1000 Calculated, Cost = 0.6920, Time elapsed: 0.57 sec
+alpha = 1e-12, iter = 5000 Calculated, Cost = 0.6875, Time elapsed: 3.23 sec
+alpha = 1e-12, iter = 10000 Calculated, Cost = 0.6819, Time elapsed: 7.58 sec
+alpha = 1e-12, iter = 50000 Calculated, Cost = 0.6404, Time elapsed: 33.33 sec
+alpha = 1e-12, iter = 1000000 Calculated, Cost = 0.2772, Time elapsed: 683.42 sec
+```
+(image)
+
 <h3> Validation </h3>
 
 ```python
@@ -543,10 +610,45 @@ $$
 
 <h3> Naive Bayes Model </h3>
 
-在開始做計算之前，Naive Bayes Model 會先將詞彙匯集成一袋的文字並統計各詞彙分別在 Positive / Negative Sentiment 句子中出現的次數，即可計算該詞彙的 Likelihood
+在開始做計算之前，Naive Bayes Model 會先將詞彙匯集成一袋的文字並統計各詞彙分別在 Positive / Negative Sentiment 句子中出現的次數，即可計算該詞彙的 Likelihood $P(w_i|class)$ ，為了避免有些詞彙只在單一 Sentiment 中出現會導致 $P(w_i|class) = 0$ 的現象，因此會進行 Laplacian Smoothing (eq. 14) 修正。修正過後的即可計算該詞彙的 Sentiment Ratio，將整句話的 Sentiment Ratio 相乘後就會得到模型對於這句話 Sentiment 的預測 (eq. 15)，但注意此時的 Sentiment Ratio $\in [0, \infty)$ ，如下圖會有不均衡量化 Negative Sentiment 的現象，若將 Likelihood 和 Prior 取 Log 後，會得到 Log Prior & Log Likelihood $\in (-\infty, \infty)$ ，即可更好的量化標準。要注意的是原本的 Sentiment Ratio 相乘 ($\prod$) 在取 Log 後要改成相加 ($\sum$)
+
+$$
+\tag{14} P(w_{class}) = \frac{freq_{class} + 1}{N_{class} + V}
+$$
+
+$$
+freq_{class}: 特定詞彙在某類別中出現的詞頻\ (Ex: ('am', pos) = 3)
+$$
+
+$$
+N_{class}: 某類別中的詞彙總數\ (N_{pos} = 13,\ N_{neg}=12)
+$$
+
+$$
+V: Unique\ words\ in\ whole\ document\ (V=8)
+$$
 
 
+$$
+\tag{15} Sentiment =  \frac{P(pos)}{P(neg)} * \frac{P(w_i|pos)}{P(w_i|neg)}
+$$
 
+$$
+\tag{16} Sentiment =  \log(\frac{P(pos)}{P(neg)} * \prod_{i=1}^n \frac{P(w_i|pos)}{P(w_i|neg)}) = \log(\frac{P(pos)}{P(neg)}) + \sum_{i=1}^n \log(\frac{P(w_i|pos)}{P(w_i|neg)})
+$$
+
+$$
+Sentiment =
+\begin{cases}
+    \begin{matrix}
+        [0, \infty),\ Positive\\
+        0,\ Neutral\\
+        (-\infty, 0],\ Negative
+    \end{matrix}
+\end{cases}\tag{5}
+$$
+
+(image: normal ratio V. Log Likelihood)
 
 
 ### Reference
