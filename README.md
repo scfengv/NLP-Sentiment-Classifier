@@ -363,7 +363,7 @@ Y = train_y
 ```
 
 ```python
-alpha_values = [1e-8, 1e-9, 1e-10, 1e-11, 1e-12]
+alpha_values = [1e-9, 1e-10, 1e-11, 1e-12]
 num_iters_values = [1000, 5000, 10000, 50000, 1000000]
 
 cost_values = np.empty((len(alpha_values), len(num_iters_values)))
@@ -395,12 +395,6 @@ plt.show()
 ```
 
 ```python
-alpha = 1e-08, iter = 1000 Calculated, Cost = 0.1013, Time elapsed: 1.37 sec
-alpha = 1e-08, iter = 5000 Calculated, Cost = nan, Time elapsed: 3.08 sec
-alpha = 1e-08, iter = 10000 Calculated, Cost = nan, Time elapsed: 5.87 sec
-alpha = 1e-08, iter = 50000 Calculated, Cost = nan, Time elapsed: 38.60 sec
-alpha = 1e-08, iter = 1000000 Calculated, Cost = nan, Time elapsed: 676.10 sec
----------------------------------------------
 alpha = 1e-09, iter = 1000 Calculated, Cost = 0.2773, Time elapsed: 0.63 sec
 alpha = 1e-09, iter = 5000 Calculated, Cost = 0.1286, Time elapsed: 2.89 sec
 alpha = 1e-09, iter = 10000 Calculated, Cost = 0.1013, Time elapsed: 5.81 sec
@@ -426,6 +420,8 @@ alpha = 1e-12, iter = 50000 Calculated, Cost = 0.6404, Time elapsed: 33.33 sec
 alpha = 1e-12, iter = 1000000 Calculated, Cost = 0.2772, Time elapsed: 683.42 sec
 ```
 (image)
+
+從 Tuning Parameter 的過程中可以看到，隨著迭代次數的上升，Cost 和 Time elapsed 之間存在著取捨的關係，且所需時間隨著迭代次數呈指數上升。Cost 來到最低的 0.1013 的有兩組，分別是 `alpha = 1e-09, iter = 10000, time = 5.81 sec` , `alpha = 1e-11, iter = 1000000, time = 682.91 sec`，最後在時間成本的考量下我在後面的 Model Training 中選擇了 `alpha = 1e-09, iter = 10000` 這組參數。可以特別注意的是在 `alpha = 1e-12` 這組中，在 `iter < 50000` 的情況下 Cost 都還非常的大，原因是因為 Learning Rate 實在是太小了，導致 Gradient Descent 的速率太慢，一直到 `iter = 1000000` Cost 才下降到平均水準。
 
 <h3> Model Training </h3>
 
@@ -818,12 +814,15 @@ Stem: ['summer', 'would', 'perfect', 'without']
 This summer would not be perfect without you. -> 1.041158
 ```
 
-
-
-
 `Naive Bayes model's accuracy = 0.9950`
 
 
 
 ### Reference
 [1] [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/). Dan Jurafsky and James H. Martin Jan 7, 2023
+
+[2] [Natural Language Processing with Classification and Vector Spaces](https://www.coursera.org/learn/classification-vector-spaces-in-nlp?specialization=natural-language-processing) DeepLearning.AI
+
+[3] [Decoding Generative and Discriminative Models](https://www.analyticsvidhya.com/blog/2021/07/deep-understanding-of-discriminative-and-generative-models-in-machine-learning/) Chirag Goyal — Published On July 19, 2021 and Last Modified On September 13th, 2023
+
+[4] [Gradient](https://en.wikipedia.org/wiki/Gradient) at Wikipedia
